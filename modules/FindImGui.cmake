@@ -82,6 +82,23 @@ endif()
 if(NOT IMGUI_DIR AND NOT TARGET imgui::imgui)
     find_package(imgui CONFIG QUIET)
 endif()
+if(NOT IMGUI_DIR AND NOT TARGET imgui::imgui)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(ImGui REQUIRED imgui)
+    if(ImGui_FOUND)
+        set(ImGui_INCLUDE_DIR ${ImGui_INCLUDEDIR})
+
+        add_library(ImGui::ImGui INTERFACE IMPORTED)
+        set_property(TARGET ImGui::ImGui APPEND PROPERTY
+            INTERFACE_INCLUDE_DIRECTORIES ${ImGui_INCLUDE_DIRS})
+        set_property(TARGET ImGui::ImGui APPEND PROPERTY
+            INTERFACE_LINK_LIBRARIES ${ImGui_LIBRARIES})
+
+        add_library(ImGui::Sources INTERFACE IMPORTED)
+        set_property(TARGET ImGui::Sources APPEND PROPERTY
+            INTERFACE_LINK_LIBRARIES ImGui::ImGui)
+    endif()
+endif()
 if(NOT IMGUI_DIR AND TARGET imgui::imgui)
     if(NOT TARGET ImGui::ImGui)
         add_library(ImGui::ImGui INTERFACE IMPORTED)
